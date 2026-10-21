@@ -11,7 +11,7 @@ One tag, `vX.Y.Z`, releases three packages through `.github/workflows/release.ym
 `distmarg-rs` ships the following wheels:
 - **stable ABI:** one `cp310-abi3` wheel per platform, which installs on CPython 3.10 and every later version.
 - **platforms:** Linux glibc (x86_64, aarch64, i686, armv7, s390x, ppc64le), Linux musl (x86_64, aarch64, armv7), macOS (x86_64, arm64) and Windows (x64, x86, arm64).
-- **free-threaded:** `cp313t` and `cp314t` wheels on Linux x86_64 and aarch64 (glibc and musl), macOS and Windows x64. The stable ABI does not cover free-threaded builds.
+- **free-threaded:** a `cp314t` wheel on Linux x86_64 and aarch64 (glibc and musl), macOS and Windows x64. The stable ABI does not cover free-threaded builds. 3.13t is not built: free-threading was experimental in 3.13, and current maturin only builds free-threaded wheels for 3.14 and later.
 
 Before anything is published, the workflow installs the built wheels on Linux (x86_64 and aarch64), macOS (Intel and Apple silicon) and Windows. It runs the test suite against them on Python 3.10, 3.14 and 3.14t.
 

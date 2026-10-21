@@ -160,7 +160,7 @@ fn _rebuild(
 }
 
 // The class is frozen and the Rust core is Send + Sync, so the module is safe
-// without the GIL (free-threaded CPython 3.13t/3.14t).
+// without the GIL on free-threaded CPython.
 #[pymodule(gil_used = false)]
 fn distmarg_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyDistanceMarginalization>()?;

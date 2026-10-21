@@ -10,8 +10,9 @@
 # `distmarg-rs` wheels for each platform:
 # - one stable-ABI wheel (cp310-abi3) that installs on CPython 3.10 and every later
 #   version, including ones released after this build;
-# - free-threaded wheels (cp313t, cp314t) on the main platforms; the stable ABI does
-#   not cover free-threaded builds.
+# - a free-threaded wheel (cp314t) on the main platforms; the stable ABI does not
+#   cover free-threaded builds. 3.13t is skipped: free-threading was experimental there
+#   and current maturin only builds free-threaded wheels for 3.14 and later.
 
 name: Release
 
@@ -98,13 +99,13 @@ jobs:
           manylinux: ${{ matrix.manylinux }}
           args: --release --out dist --features abi3 -i 3.10
           working-directory: rust/distmarg
-      - name: Free-threaded wheels (3.13t, 3.14t)
+      - name: Free-threaded wheel (3.14t)
         if: matrix.free_threaded
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
           manylinux: ${{ matrix.manylinux }}
-          args: --release --out dist -i 3.13t 3.14t
+          args: --release --out dist -i 3.14t
           working-directory: rust/distmarg
       - uses: actions/upload-artifact@v6
         with:
@@ -135,12 +136,6 @@ jobs:
         with:
           python-version: ${{ matrix.abi3_python }}
           architecture: ${{ matrix.arch }}
-      - id: py313t
-        if: matrix.free_threaded
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13t"
-          architecture: ${{ matrix.arch }}
       - id: py314t
         if: matrix.free_threaded
         uses: actions/setup-python@v6
@@ -153,14 +148,13 @@ jobs:
         env:
           PY: ${{ steps.py_abi3.outputs.python-path }}
         run: uvx maturin build --release --out dist --target ${{ matrix.rust_target }} --features abi3 -i "$PY"
-      - name: Free-threaded wheels (3.13t, 3.14t)
+      - name: Free-threaded wheel (3.14t)
         if: matrix.free_threaded
         shell: bash
         working-directory: rust/distmarg
         env:
-          PY313T: ${{ steps.py313t.outputs.python-path }}
           PY314T: ${{ steps.py314t.outputs.python-path }}
-        run: uvx maturin build --release --out dist --target ${{ matrix.rust_target }} -i "$PY313T" "$PY314T"
+        run: uvx maturin build --release --out dist --target ${{ matrix.rust_target }} -i "$PY314T"
       - uses: actions/upload-artifact@v6
         with:
           name: wheels-${{ matrix.runner }}-${{ matrix.rust_target }}
