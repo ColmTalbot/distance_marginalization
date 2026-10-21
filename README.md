@@ -80,7 +80,7 @@ benchmarks/           generated reports
 ## Running things
 
 ```bash
-uv venv .venv && uv pip install --python .venv/bin/python -e "python[test]" jax torch bilby
+uv venv --python 3.14 .venv && uv pip install --python .venv/bin/python -e "python[test]" jax torch bilby
 ```
 
 ```bash

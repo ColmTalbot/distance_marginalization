@@ -47,7 +47,7 @@ jobs:
         run: .venv/bin/python -m pytest python/tests -q -rs
 
   python-full:
-    name: Python 3.12, JAX + torch + Bilby + Rust backend, cross-check
+    name: Python 3.14, JAX + torch + Bilby + Rust backend, cross-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
           workspaces: rust
       - name: Install
         run: |
-          uv venv --python 3.12 .venv
+          uv venv --python 3.14 .venv
           uv pip install --python .venv/bin/python -e "python[test]" "jax[cpu]" bilby astropy maturin
           uv pip install --python .venv/bin/python torch --index-url https://download.pytorch.org/whl/cpu
       - name: Build the Rust extension (distmarg_rs)
