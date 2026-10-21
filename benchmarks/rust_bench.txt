@@ -1,0 +1,135 @@
+    Finished `bench` profile [optimized] target(s) in 0.03s
+     Running benches/bench.rs (target/release/deps/bench-946b94b9a45784ff)
+Benchmarking scalar/nophase/high_snr
+Benchmarking scalar/nophase/high_snr: Warming up for 1.0000 s
+Benchmarking scalar/nophase/high_snr: Collecting 100 samples in estimated 3.0016 s (7.4M iterations)
+Benchmarking scalar/nophase/high_snr: Analyzing
+scalar/nophase/high_snr time:   [401.11 ns 403.22 ns 405.28 ns]
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) low mild
+  1 (1.00%) high severe
+
+Benchmarking scalar/nophase/prior_dominated
+Benchmarking scalar/nophase/prior_dominated: Warming up for 1.0000 s
+Benchmarking scalar/nophase/prior_dominated: Collecting 100 samples in estimated 3.0006 s (24M iterations)
+Benchmarking scalar/nophase/prior_dominated: Analyzing
+scalar/nophase/prior_dominated
+                        time:   [127.07 ns 127.91 ns 128.67 ns]
+Found 16 outliers among 100 measurements (16.00%)
+  14 (14.00%) high mild
+  2 (2.00%) high severe
+
+Benchmarking scalar/nophase/quadrature
+Benchmarking scalar/nophase/quadrature: Warming up for 1.0000 s
+Benchmarking scalar/nophase/quadrature: Collecting 100 samples in estimated 3.0008 s (515k iterations)
+Benchmarking scalar/nophase/quadrature: Analyzing
+scalar/nophase/quadrature
+                        time:   [5.8343 µs 5.8539 µs 5.8730 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) low mild
+  1 (1.00%) high severe
+
+Benchmarking batch/nophase/serial/1000
+Benchmarking batch/nophase/serial/1000: Warming up for 1.0000 s
+Benchmarking batch/nophase/serial/1000: Collecting 100 samples in estimated 3.2059 s (900 iterations)
+Benchmarking batch/nophase/serial/1000: Analyzing
+batch/nophase/serial/1000
+                        time:   [3.4813 ms 3.4989 ms 3.5166 ms]
+Benchmarking batch/nophase/rayon/1000
+Benchmarking batch/nophase/rayon/1000: Warming up for 1.0000 s
+Benchmarking batch/nophase/rayon/1000: Collecting 100 samples in estimated 3.2027 s (900 iterations)
+Benchmarking batch/nophase/rayon/1000: Analyzing
+batch/nophase/rayon/1000
+                        time:   [3.5712 ms 3.5808 ms 3.5904 ms]
+
+Benchmarking batch/nophase/serial/1000000
+Benchmarking batch/nophase/serial/1000000: Warming up for 1.0000 s
+
+Warning: Unable to complete 10 samples in 3.0s. You may wish to increase target time to 35.3s.
+Benchmarking batch/nophase/serial/1000000: Collecting 10 samples in estimated 35.278 s (10 iterations)
+Benchmarking batch/nophase/serial/1000000: Analyzing
+batch/nophase/serial/1000000
+                        time:   [3.5204 s 3.5234 s 3.5261 s]
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) low mild
+Benchmarking batch/nophase/rayon/1000000
+Benchmarking batch/nophase/rayon/1000000: Warming up for 1.0000 s
+Benchmarking batch/nophase/rayon/1000000: Collecting 10 samples in estimated 4.0126 s (20 iterations)
+Benchmarking batch/nophase/rayon/1000000: Analyzing
+batch/nophase/rayon/1000000
+                        time:   [199.91 ms 200.49 ms 201.24 ms]
+Found 3 outliers among 10 measurements (30.00%)
+  1 (10.00%) low mild
+  1 (10.00%) high mild
+  1 (10.00%) high severe
+
+Benchmarking scalar/phase/high_snr
+Benchmarking scalar/phase/high_snr: Warming up for 1.0000 s
+Benchmarking scalar/phase/high_snr: Collecting 100 samples in estimated 3.0013 s (7.6M iterations)
+Benchmarking scalar/phase/high_snr: Analyzing
+scalar/phase/high_snr   time:   [397.50 ns 398.79 ns 400.10 ns]
+Found 6 outliers among 100 measurements (6.00%)
+  3 (3.00%) low mild
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+
+Benchmarking scalar/phase/prior_dominated
+Benchmarking scalar/phase/prior_dominated: Warming up for 1.0000 s
+Benchmarking scalar/phase/prior_dominated: Collecting 100 samples in estimated 3.0009 s (5.1M iterations)
+Benchmarking scalar/phase/prior_dominated: Analyzing
+scalar/phase/prior_dominated
+                        time:   [585.30 ns 586.95 ns 588.59 ns]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+
+Benchmarking scalar/phase/quadrature
+Benchmarking scalar/phase/quadrature: Warming up for 1.0000 s
+Benchmarking scalar/phase/quadrature: Collecting 100 samples in estimated 3.0013 s (303k iterations)
+Benchmarking scalar/phase/quadrature: Analyzing
+scalar/phase/quadrature time:   [9.8715 µs 9.9058 µs 9.9400 µs]
+Found 10 outliers among 100 measurements (10.00%)
+  7 (7.00%) low mild
+  3 (3.00%) high mild
+
+Benchmarking batch/phase/serial/1000
+Benchmarking batch/phase/serial/1000: Warming up for 1.0000 s
+Benchmarking batch/phase/serial/1000: Collecting 100 samples in estimated 3.3297 s (600 iterations)
+Benchmarking batch/phase/serial/1000: Analyzing
+batch/phase/serial/1000 time:   [5.5191 ms 5.5350 ms 5.5512 ms]
+Found 7 outliers among 100 measurements (7.00%)
+  3 (3.00%) low mild
+  4 (4.00%) high mild
+Benchmarking batch/phase/rayon/1000
+Benchmarking batch/phase/rayon/1000: Warming up for 1.0000 s
+Benchmarking batch/phase/rayon/1000: Collecting 100 samples in estimated 3.3194 s (600 iterations)
+Benchmarking batch/phase/rayon/1000: Analyzing
+batch/phase/rayon/1000  time:   [5.5203 ms 5.5402 ms 5.5593 ms]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) low mild
+
+Benchmarking batch/phase/serial/1000000
+Benchmarking batch/phase/serial/1000000: Warming up for 1.0000 s
+
+Warning: Unable to complete 10 samples in 3.0s. You may wish to increase target time to 55.3s.
+Benchmarking batch/phase/serial/1000000: Collecting 10 samples in estimated 55.289 s (10 iterations)
+Benchmarking batch/phase/serial/1000000: Analyzing
+batch/phase/serial/1000000
+                        time:   [5.5186 s 5.5231 s 5.5271 s]
+Benchmarking batch/phase/rayon/1000000
+Benchmarking batch/phase/rayon/1000000: Warming up for 1.0000 s
+
+Warning: Unable to complete 10 samples in 3.0s. You may wish to increase target time to 3.1s.
+Benchmarking batch/phase/rayon/1000000: Collecting 10 samples in estimated 3.1289 s (10 iterations)
+Benchmarking batch/phase/rayon/1000000: Analyzing
+batch/phase/rayon/1000000
+                        time:   [311.98 ms 313.61 ms 315.37 ms]
+
+Benchmarking construct/usf_100_5000
+Benchmarking construct/usf_100_5000: Warming up for 1.0000 s
+Benchmarking construct/usf_100_5000: Collecting 100 samples in estimated 3.1363 s (1100 iterations)
+Benchmarking construct/usf_100_5000: Analyzing
+construct/usf_100_5000  time:   [2.8436 ms 2.8516 ms 2.8601 ms]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+

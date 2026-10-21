@@ -1,0 +1,13 @@
+[build-system]
+requires = ["maturin>=1.5,<2"]
+build-backend = "maturin"
+
+[project]
+name = "distmarg-rs"
+version = "0.1.0"
+description = "Python bindings to the Rust distmarg crate (scalar fast path for distmarg)"
+requires-python = ">=3.10"
+
+[tool.maturin]
+module-name = "distmarg_rs"
+features = ["python", "parallel", "pyo3/extension-module"]

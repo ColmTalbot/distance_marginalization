@@ -1,0 +1,12 @@
+[workspace]
+members = ["distmarg"]
+resolver = "2"
+
+[profile.release]
+debug = false
+lto = "thin"
+codegen-units = 1
+
+[profile.bench]
+lto = "thin"
+codegen-units = 1
