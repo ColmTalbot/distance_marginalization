@@ -9,9 +9,3 @@ rust/target/
 # generated outputs (recreate with tools/benchmark.py and examples/*.py)
 benchmarks/cache/
 examples/outdir/
-
-# original background documents, kept locally only
-usf_prior_tests.py
-distance_marginalization_review.md
-peak_parameterization.md
-references/

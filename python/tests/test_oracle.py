@@ -23,7 +23,7 @@ def test_against_mpmath_oracle(name, phase, backend):
 
 
 def test_known_values_d2_prior():
-    """Spot values from peak_parameterization.md (d^2 prior on [50, 5000], d0 = 1 Gpc)."""
+    """Spot values from an independent direct quadrature in distance (d^2 prior on [50, 5000], d0 = 1 Gpc)."""
     from distmarg import DistanceMarginalization
 
     d = np.geomspace(50, 5000, 4096)

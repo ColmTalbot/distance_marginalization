@@ -1,10 +1,6 @@
 # Implementation notes: `DistanceMarginalization` class
 
-These are hand-off notes for a Claude Code session. Read these first:
-
-- `peak_parameterization.md`: the derivations
-- `usf_prior_tests.py`: numpy-only prototype and reference quadrature; run it with `python -W ignore usf_prior_tests.py`, about 90 s
-- `distance_marginalization_review.md` and `references/notes/`: background
+These notes are the original specification for both implementations. `SPEC_DECISIONS.md` records the details this document left open and every place where the implementations depart from it. Numbers labelled "exploratory" come from an early numpy-only study that preceded the implementations.
 
 ---
 
@@ -126,7 +122,7 @@ The two implementations are independent, so they must agree on **which continuou
 - For `UniformSourceFrame` and other `bilby.gw.prior.Cosmological` subclasses, **do not use `prior.prob`**. As far as I recall, Bilby builds these as interpolated priors on a finite grid, which would show up as fit residual. *Verify in the installed Bilby.* Instead, recompute the density on a log-spaced grid from `prior.cosmology` (astropy):
   - $\pi(z)\propto(1+z)^{-1}\,\mathrm dV_c/\mathrm dz$
   - $\pi_d=\pi(z)/(\mathrm dd_L/\mathrm dz)$, with $\mathrm dd_L/\mathrm dz=D_C+(1+z)D_H/E(z)$
-  - The numpy-only version in `usf_prior_tests.py` hard-codes flat Planck15; the helper should use the prior's own cosmology.
+  - The helper should use the prior's own cosmology rather than a hard-coded one.
 - Handle the prior possibly being defined in `redshift` or `comoving_distance` rather than `luminosity_distance`. Convert the support and include the Jacobian, or raise.
 - For other priors, evaluate `prior.ln_prob` on the grid.
 - The helper returns arrays and passes them to the constructor; the core class never imports Bilby.
@@ -153,7 +149,7 @@ $$
 
 For the phase case, $\ln w=\ln\bar I_0(cv)$ and $(\ln w)'=c\,[I_1/I_0(cx)-1]$; more simply, use the large-argument form $\ln\bar I_0(x)\approx-\tfrac12\ln(2\pi x)+\ldots$, since $cv\gtrsim\rho^2\ge900$ in this branch.
 
-**Prototype results** (USF; prototype model without the $w$-curvature term), max |error| in $\ln\mathcal L_D$ for $\rho\ge30$ over $d_\star\in[d_{\min}/5,5d_{\max}]$:
+**Exploratory results** (USF; model without the $w$-curvature term), max |error| in $\ln\mathcal L_D$ for $\rho\ge30$ over $d_\star\in[d_{\min}/5,5d_{\max}]$:
 
 | Prior | No phase | Phase |
 |---|---|---|
@@ -173,10 +169,10 @@ $$
 \mathbb E[(\ln\ell)^n]=\sum_{j=0}^{n}\binom nj A^{n-j}(-B/2)^j\,\mu_{n+j}.
 $$
 
-The cumulants $\kappa_n$ follow from these raw moments. See `lnI_cumulant` in the prototype; it is a closed-form polynomial, so no table is needed.
+The cumulants $\kappa_n$ follow from these raw moments. This is a closed-form polynomial, so no table is needed.
 
 - **Selection criterion:** use $\kappa_2=\mathrm{Var}_\pi[\ln\ell]<$ `kappa2_low`. It is computed from the same moments and is a better control variable than $\rho_{\rm opt}(d_{\min})$. Calibrate the threshold by benchmark.
-- **Prototype accuracy at O3** (max over $\rho_{\rm mf}\in[-3,5]$):
+- **Exploratory accuracy at O3** (max over $\rho_{\rm mf}\in[-3,5]$):
 
 | $\rho_{\rm opt}(d_{\min})$ | [100, 5000] Mpc | [10, 5e4] Mpc |
 |---|---|---|
@@ -188,7 +184,7 @@ The cumulants $\kappa_n$ follow from these raw moments. See `lnI_cumulant` in th
 | 5 | fails | 4e-3 |
 
 - The series is **asymptotic**: at large $\kappa_2$, going to higher order stops helping (O1→O4 error 2.7→1.8). Do not chase convergence.
-- **Phase case:** $\ln\ell$ is no longer polynomial in $v$, because $\ln\bar I_0(cv)+cv=\ln I_0(cv)$. Use the small-argument expansion $\ln I_0(x)=x^2/4-x^4/64+\ldots$, which keeps it polynomial in $v$: replace $A v$ by the series in $(cv)^2$ and reuse the moments up to the required order. **Derive and verify this; the prototype has not done it.**
+- **Phase case:** $\ln\ell$ is no longer polynomial in $v$, because $\ln\bar I_0(cv)+cv=\ln I_0(cv)$. Use the small-argument expansion $\ln I_0(x)=x^2/4-x^4/64+\ldots$, which keeps it polynomial in $v$: replace $A v$ by the series in $(cv)^2$ and reuse the moments up to the required order. **Derive and verify this; the exploratory study did not.**
 
 ### 4.3 Middle regime: a compact 2D representation of the residual
 
@@ -204,7 +200,7 @@ This covers everything not in 4.1 or 4.2.
   - Fix the domain, node placement and `table_shape` in the spec, so that Python and Rust tables can also be compared coefficient by coefficient.
   - A bicubic uniform grid is the fallback.
 - **Points outside the domain:** clamp $x,y$ to the domain and rely on the regime selection. Then **check continuity at every regime boundary**, with the jump in $\ln\mathcal L_D$ below the target tolerance.
-- **Expected size of $T$:** the prototype shows $\ln R\in[0,6]$ for [100, 5000] Mpc and $[0,15]$ for [10, 5e4] Mpc over the full stress grid. The large values occur at low $\rho$, where 4.2 should take over. Inside the middle band, $T$ should be of order 0.01–1.
+- **Expected size of $T$:** exploratory calculations show $\ln R\in[0,6]$ for [100, 5000] Mpc and $[0,15]$ for [10, 5e4] Mpc over the full stress grid. The large values occur at low $\rho$, where 4.2 should take over. Inside the middle band, $T$ should be of order 0.01–1.
 - **Is the 2D fit needed?** Possibly not. If the boundary between 4.1 and 4.2 can be pushed until they overlap with acceptable error, the 2D representation becomes unnecessary. Gauss–Hermite quadrature in $v$ about $\bar v$ is another option: about 10–20 nodes in a fixed-size loop, with no table, which also supports non-separable priors. Benchmark both.
 
 ## 5. Reference quadrature (tests and table construction; numpy, float64)
@@ -215,7 +211,7 @@ Integrate in $v$ on a composite grid that contains:
 - a dense grid within $\pm12\sigma_v$ of the clipped peak;
 - when the peak lies outside the support, a dense grid over the tail scale $\lambda=\sigma_v^2/|v_\star-v_{\rm edge}|$ next to the edge.
 
-See `lnI_ref` in the prototype. The tail grid is **essential**. An earlier version without it reported spurious $\ln R\sim1$ at $\rho\ge10^3$. Cross-check a subset against `scipy.integrate.quad` or `mpmath.quad` with explicit breakpoints.
+The tail grid is **essential**. An earlier version without it reported spurious $\ln R\sim1$ at $\rho\ge10^3$. Cross-check a subset against `scipy.integrate.quad` or `mpmath.quad` with explicit breakpoints.
 
 ## 6. Array API and JAX constraints
 
@@ -236,7 +232,7 @@ See `lnI_ref` in the prototype. The tail grid is **essential**. An earlier versi
 ## 7. Tests (pytest)
 
 1. **Identity checks:**
-   - $\ln\mathcal L_D$ against direct quadrature of $\int\pi(d)\exp(\ldots)\,\mathrm dd$ in the original variables, for both flags. The table in `peak_parameterization.md` gives known values for a $d^2$ prior.
+   - $\ln\mathcal L_D$ against direct quadrature of $\int\pi(d)\exp(\ldots)\,\mathrm dd$ in the original variables, for both flags, including known values for a $d^2$ prior.
    - `d_ref` invariance: rescale `d_ref`→`k·d_ref` and `rho_opt`→`rho_opt/k`; the result must be unchanged.
 2. **Stress-grid accuracy** for USF on [100, 5000] and [10, 5e4] Mpc, both flags:
    - $d_\star\in[d_{\min}/5,5d_{\max}]$, $\rho_{\rm mf}\in[10^{-3},10^4]$ including negative values (no phase), and $\rho_{\rm opt}(d_{\min})\in[10^{-3},10^3]$;
@@ -383,14 +379,12 @@ distmarg-eval --prior fixtures/priors/usf_100_5000.json [--phase] [--config cfg.
 
 ```
 distance_marginalization/
-  IMPLEMENTATION_NOTES.md  peak_parameterization.md  distance_marginalization_review.md
-  usf_prior_tests.py                        # prototype (reference only; not a dependency)
+  IMPLEMENTATION_NOTES.md
   python/distmarg/{__init__,core,_special,_chebyshev,_prior,_quadrature,bilby}.py
   python/tests/
   rust/                                      # §10.2
   fixtures/{priors/*.json, oracle_*.json, prior_fit_*.json, stress_queries.json}
   tools/{export_prior.py, make_fixtures.py, cross_check.py, benchmark.py}
-  references/
 ```
 
 **Suggested build order:**

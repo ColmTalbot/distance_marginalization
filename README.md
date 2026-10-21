@@ -11,7 +11,6 @@ These documents define the specification:
 
 - `IMPLEMENTATION_NOTES.md` is the original specification.
 - `SPEC_DECISIONS.md` records every detail the notes left open, and every place where the notes were changed. Read it first.
-- `peak_parameterization.md` contains the derivations. It is kept locally and not tracked in git, like the literature review, the original prototype (`usf_prior_tests.py`) and `references/`.
 
 ## Quick start
 

@@ -171,7 +171,7 @@ $$
   - $(\ln w)''=A^2(1-r/x-r^2)$, with $r/x\to\tfrac12$ for $x<10^{-8}$.
 
 Including the $w$-curvature brings the phase errors down to the same level as
-the no-phase case: ≤ 4e-5 at the default thresholds, against 2.3e-3 in the prototype.
+the no-phase case: ≤ 4e-5 at the default thresholds, against 2.3e-3 in the exploratory model without it.
 
 ## 8. Python evaluation strategy
 
