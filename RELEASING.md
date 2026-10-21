@@ -40,7 +40,7 @@ Before anything is published, the workflow installs the built wheels on Linux (x
    ```bash
    python tools/check_versions.py
    ```
-2. Commit, then do a dry run: *Actions → Release → Run workflow* on `main`. This builds and tests every wheel and publishes nothing.
+2. Optionally write release notes in `.github/release-notes/vX.Y.Z.md`; the GitHub release uses them instead of automatic notes. Commit, then do a dry run: *Actions → Release → Run workflow* on `main`. This builds and tests every wheel and publishes nothing.
 3. Tag and push:
    ```bash
    git tag v0.1.0

@@ -234,6 +234,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v7
         with:
           pattern: "{dist-*,wheels-*}"
@@ -242,4 +243,9 @@ jobs:
       - name: Create release with all artifacts
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" --title "${{ github.ref_name }}" --generate-notes --verify-tag
+          TAG: ${{ github.ref_name }}
+        # hand-written notes in .github/release-notes/<tag>.md if present, else GitHub's
+        run: |
+          notes=".github/release-notes/${TAG}.md"
+          if [ -f "$notes" ]; then src=(--notes-file "$notes"); else src=(--generate-notes); fi
+          gh release create "$TAG" dist/* --repo "${{ github.repository }}" --title "$TAG" "${src[@]}" --verify-tag
