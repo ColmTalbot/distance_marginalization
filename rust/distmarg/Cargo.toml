@@ -2,8 +2,15 @@
 name = "distmarg"
 version = "0.1.0"
 edition = "2021"
-description = "Distance-marginalized gravitational-wave likelihood in the (rho_mf, v*) basis (independent Rust implementation)"
+description = "Distance-marginalized gravitational-wave likelihood in the (rho_mf, v*) basis"
 license = "MIT"
+repository = "https://github.com/ColmTalbot/distance_marginalization"
+readme = "README.md"
+keywords = ["gravitational-waves", "likelihood", "marginalization", "bayesian", "astrophysics"]
+categories = ["science", "mathematics"]
+rust-version = "1.80"
+# integration tests and benchmarks read ../../fixtures, which is not part of the crate
+exclude = ["tests/", "benches/"]
 
 [lib]
 # rlib for Rust users; cdylib so maturin can build the Python extension (feature "python")
@@ -13,6 +20,8 @@ crate-type = ["rlib", "cdylib"]
 default = []
 # Python bindings (module `distmarg_rs`); built by maturin, never needed from Rust
 python = ["dep:pyo3", "dep:numpy"]
+# stable-ABI wheel for CPython >= 3.10 (one wheel per platform covers all versions)
+abi3 = ["python", "pyo3/abi3-py310", "pyo3/generate-import-lib"]
 # file-based evaluation CLI (distmarg-eval)
 cli = ["dep:serde_json"]
 # rayon-parallel batch evaluation

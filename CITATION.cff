@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "distmarg: distance-marginalized gravitational-wave likelihood"
+abstract: >-
+  Distance-marginalized gravitational-wave likelihood ln(L_D / Z_N) in the
+  (rho_mf, v*) basis, with and without phase marginalization, for any smooth
+  tabulated luminosity-distance prior. Two independent implementations are
+  provided: an array-API Python package (numpy, JAX, torch, CuPy) and a Rust
+  crate with Python bindings.
+authors:
+  - family-names: Talbot
+    given-names: Colm
+    affiliation: Princeton University
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/ColmTalbot/distance_marginalization"
+keywords:
+  - gravitational waves
+  - Bayesian inference
+  - likelihood
+  - marginalization
+  - Rust
+  - Python

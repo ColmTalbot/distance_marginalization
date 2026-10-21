@@ -12,6 +12,22 @@ These documents define the specification:
 - `IMPLEMENTATION_NOTES.md` is the original specification.
 - `SPEC_DECISIONS.md` records every detail the notes left open, and every place where the notes were changed. Read it first.
 
+## Installation
+
+```bash
+pip install distmarg
+```
+
+```bash
+pip install "distmarg[rust]"
+```
+
+```bash
+cargo add distmarg
+```
+
+The first installs the pure-Python package. The second adds the compiled backend. The third adds the Rust crate to a Rust project.
+
 ## Quick start
 
 ```python
@@ -125,6 +141,10 @@ cargo run --release --features cli --bin distmarg-eval -- \
     --prior fixtures/priors/usf_100_5000.json [--phase] [--config cfg.json] \
     --queries fixtures/stress_queries_usf_100_5000.json --out results.json [--fit-info fit.json]
 ```
+
+## Citing
+
+Please cite this software using the metadata in `CITATION.cff` (GitHub's "Cite this repository" button).
 
 ## License
 

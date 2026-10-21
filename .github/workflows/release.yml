@@ -1,0 +1,251 @@
+# Release: the Rust crate `distmarg` (crates.io), the Python bindings `distmarg-rs`
+# and the Python package `distmarg` (PyPI), plus a GitHub release with every artifact.
+#
+# - Push a tag `vX.Y.Z` to build, test and publish.
+# - Run manually ("Run workflow") for a dry run: build and test everything, publish nothing.
+#
+# One-time setup (PyPI trusted publishers, GitHub environments, crates.io token) is
+# described in RELEASING.md.
+#
+# `distmarg-rs` wheels for each platform:
+# - one stable-ABI wheel (cp310-abi3) that installs on CPython 3.10 and every later
+#   version, including ones released after this build;
+# - free-threaded wheels (cp313t, cp314t) on the main platforms; the stable ABI does
+#   not cover free-threaded builds.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  versions:
+    name: Check versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Tag, crate, Python package and extra pin agree
+        run: python3 tools/check_versions.py ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+
+  python-dist:
+    name: distmarg sdist and wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - run: uv build python --out-dir dist
+      - uses: actions/upload-artifact@v6
+        with:
+          name: dist-python
+          path: dist
+
+  crate-check:
+    name: Crate packaging (cargo publish --dry-run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - working-directory: rust/distmarg
+        run: cargo publish --dry-run
+
+  rust-sdist:
+    name: distmarg-rs sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+          working-directory: rust/distmarg
+      - uses: actions/upload-artifact@v6
+        with:
+          name: dist-rs-sdist
+          path: rust/distmarg/dist
+
+  linux:
+    name: distmarg-rs wheels, ${{ matrix.manylinux }} ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # native runners: stable-ABI and free-threaded wheels
+          - { runner: ubuntu-22.04, target: x86_64, manylinux: auto, free_threaded: true }
+          - { runner: ubuntu-22.04-arm, target: aarch64, manylinux: auto, free_threaded: true }
+          - { runner: ubuntu-22.04, target: x86_64, manylinux: musllinux_1_2, free_threaded: true }
+          - { runner: ubuntu-22.04-arm, target: aarch64, manylinux: musllinux_1_2, free_threaded: true }
+          # cross-compiled: stable-ABI wheel only
+          - { runner: ubuntu-22.04, target: x86, manylinux: auto, free_threaded: false }
+          - { runner: ubuntu-22.04, target: armv7, manylinux: auto, free_threaded: false }
+          - { runner: ubuntu-22.04, target: s390x, manylinux: auto, free_threaded: false }
+          - { runner: ubuntu-22.04, target: ppc64le, manylinux: auto, free_threaded: false }
+          - { runner: ubuntu-22.04, target: armv7, manylinux: musllinux_1_2, free_threaded: false }
+    steps:
+      - uses: actions/checkout@v6
+      - name: Stable-ABI wheel (CPython >= 3.10)
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: --release --out dist --features abi3 -i 3.10
+          working-directory: rust/distmarg
+      - name: Free-threaded wheels (3.13t, 3.14t)
+        if: matrix.free_threaded
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          args: --release --out dist -i 3.13t 3.14t
+          working-directory: rust/distmarg
+      - uses: actions/upload-artifact@v6
+        with:
+          name: wheels-${{ matrix.manylinux }}-${{ matrix.target }}
+          path: rust/distmarg/dist
+
+  macos-windows:
+    name: distmarg-rs wheels, ${{ matrix.runner }} ${{ matrix.rust_target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # abi3_python only runs the build; any CPython >= 3.10 gives the same cp310-abi3 wheel
+          - { runner: macos-15-intel, rust_target: x86_64-apple-darwin, arch: x64, abi3_python: "3.10", free_threaded: true }
+          - { runner: macos-latest, rust_target: aarch64-apple-darwin, arch: arm64, abi3_python: "3.10", free_threaded: true }
+          - { runner: windows-latest, rust_target: x86_64-pc-windows-msvc, arch: x64, abi3_python: "3.10", free_threaded: true }
+          - { runner: windows-latest, rust_target: i686-pc-windows-msvc, arch: x86, abi3_python: "3.10", free_threaded: false }
+          - { runner: windows-11-arm, rust_target: aarch64-pc-windows-msvc, arch: arm64, abi3_python: "3.11", free_threaded: false }
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+      - uses: astral-sh/setup-uv@v7
+      - id: py_abi3
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.abi3_python }}
+          architecture: ${{ matrix.arch }}
+      - id: py313t
+        if: matrix.free_threaded
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13t"
+          architecture: ${{ matrix.arch }}
+      - id: py314t
+        if: matrix.free_threaded
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14t"
+          architecture: ${{ matrix.arch }}
+      - name: Stable-ABI wheel (CPython >= 3.10)
+        shell: bash
+        working-directory: rust/distmarg
+        env:
+          PY: ${{ steps.py_abi3.outputs.python-path }}
+        run: uvx maturin build --release --out dist --target ${{ matrix.rust_target }} --features abi3 -i "$PY"
+      - name: Free-threaded wheels (3.13t, 3.14t)
+        if: matrix.free_threaded
+        shell: bash
+        working-directory: rust/distmarg
+        env:
+          PY313T: ${{ steps.py313t.outputs.python-path }}
+          PY314T: ${{ steps.py314t.outputs.python-path }}
+        run: uvx maturin build --release --out dist --target ${{ matrix.rust_target }} -i "$PY313T" "$PY314T"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: wheels-${{ matrix.runner }}-${{ matrix.rust_target }}
+          path: rust/distmarg/dist
+
+  test-wheels:
+    name: Test built wheels, ${{ matrix.runner }} Python ${{ matrix.python }}
+    needs: [python-dist, linux, macos-windows]
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-22.04, ubuntu-22.04-arm, macos-15-intel, macos-latest, windows-latest]
+        python: ["3.10", "3.14", "3.14t"]
+    env:
+      SCIPY_ARRAY_API: "1"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: "{dist-python,wheels-*}"
+          path: dist
+          merge-multiple: true
+      - name: Install the built distmarg and distmarg-rs (not the source tree)
+        shell: bash
+        run: |
+          uv venv --python ${{ matrix.python }} .venv-test
+          uv pip install --python .venv-test --find-links dist "distmarg[test,rust]"
+          .venv-test/${{ runner.os == 'Windows' && 'Scripts/python.exe' || 'bin/python' }} -c "import distmarg, distmarg_rs; print(distmarg.__file__, distmarg_rs.__file__)"
+      - name: Test suite against the installed packages
+        shell: bash
+        run: |
+          cd python/tests
+          ../../.venv-test/${{ runner.os == 'Windows' && 'Scripts/python.exe' || 'bin/python' }} -m pytest -q -rs -p no:cacheprovider .
+
+  publish-crate:
+    name: Publish distmarg to crates.io
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [versions, crate-check, test-wheels]
+    runs-on: ubuntu-latest
+    environment:
+      name: crates-io
+      url: https://crates.io/crates/distmarg
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - working-directory: rust/distmarg
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+  publish-pypi:
+    name: Publish distmarg and distmarg-rs to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [versions, python-dist, rust-sdist, test-wheels]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/distmarg/
+    permissions:
+      id-token: write  # trusted publishing; also produces PEP 740 attestations
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: "{dist-*,wheels-*}"
+          path: dist
+          merge-multiple: true
+      - run: ls -l dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [publish-crate, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: "{dist-*,wheels-*}"
+          path: dist
+          merge-multiple: true
+      - name: Create release with all artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" --title "${{ github.ref_name }}" --generate-notes --verify-tag

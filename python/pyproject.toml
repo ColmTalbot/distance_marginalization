@@ -4,20 +4,33 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "distmarg"
-version = "0.1.0"
+dynamic = ["version"]  # from distmarg.__version__
 description = "Distance-marginalized gravitational-wave likelihood in the (rho_mf, v*) basis, array-API compatible"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 dependencies = ["numpy>=1.24", "scipy>=1.15", "array-api-compat>=1.4"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Repository = "https://github.com/ColmTalbot/distance_marginalization"
 
 [project.optional-dependencies]
-scipy = ["scipy>=1.10"]
+# compiled backend; pinned to the same release (checked by the release workflow)
+rust = ["distmarg-rs==0.1.0"]
 jax = ["jax>=0.4"]
 bilby = ["bilby", "astropy"]
 test = ["pytest", "scipy", "mpmath"]
 
 [tool.setuptools]
 packages = ["distmarg"]
+
+[tool.setuptools.dynamic]
+version = {attr = "distmarg.__version__"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
