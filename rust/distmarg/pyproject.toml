@@ -7,6 +7,7 @@ name = "distmarg-rs"
 version = "0.1.0"
 description = "Python bindings to the Rust distmarg crate (scalar fast path for distmarg)"
 requires-python = ">=3.10"
+license = "MIT"
 
 [tool.maturin]
 module-name = "distmarg_rs"

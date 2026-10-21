@@ -125,3 +125,7 @@ cargo run --release --features cli --bin distmarg-eval -- \
     --prior fixtures/priors/usf_100_5000.json [--phase] [--config cfg.json] \
     --queries fixtures/stress_queries_usf_100_5000.json --out results.json [--fit-info fit.json]
 ```
+
+## License
+
+MIT; see `LICENSE`.
