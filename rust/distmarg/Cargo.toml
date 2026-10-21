@@ -20,8 +20,10 @@ crate-type = ["rlib", "cdylib"]
 default = []
 # Python bindings (module `distmarg_rs`); built by maturin, never needed from Rust
 python = ["dep:pyo3", "dep:numpy"]
-# stable-ABI wheel for CPython >= 3.10 (one wheel per platform covers all versions)
-abi3 = ["python", "pyo3/abi3-py310", "pyo3/generate-import-lib"]
+# complete configuration of the stable-ABI wheel for CPython >= 3.10 (one wheel per
+# platform covers all versions). Self-contained because `maturin --features abi3`
+# replaces, rather than extends, the features listed in pyproject.toml.
+abi3 = ["python", "parallel", "pyo3/extension-module", "pyo3/abi3-py310", "pyo3/generate-import-lib"]
 # file-based evaluation CLI (distmarg-eval)
 cli = ["dep:serde_json"]
 # rayon-parallel batch evaluation
