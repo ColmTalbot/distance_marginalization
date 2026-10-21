@@ -73,7 +73,7 @@ so the log-likelihood is a quadratic function of $1/d_L$ for fixed values of all
 Distance marginalization was introduced for rapid localization~\cite{Singer2016a,Singer2016b} and is now standard in general-purpose inference codes~\cite{Thrane2019,Ashton2019,RomeroShaw2020}.
 It is also a building block of more aggressive marginalization schemes~\cite{Pankow2015,Lange2018,Roulet2024}.
 
-The usual implementation tabulates the marginalized likelihood on a two-dimensional grid of the inner products $\langle d|h\rangle$ and $\langle h|h\rangle$,
+A standard implementation tabulates the marginalized likelihood on a two-dimensional grid of the inner products $\langle d|h\rangle$ and $\langle h|h\rangle$,
 evaluated at a reference distance,
 and interpolates it during sampling~\cite{Thrane2019,Roulet2024}.
 A table is simple and fast,
@@ -710,6 +710,11 @@ differentiable evaluation,
 accurate to $\sim10^{-5}$ in $\ln\mathcal{L}$ at all SNRs,
 at a cost comparable to or below that of interpolating a precomputed table,
 and well below the level of systematic error in the likelihood that can lead to significant biases~\cite{2023MNRAS.526.3495T,2025arXiv250907221H}.
+Concurrent work has also exploited the fact that the distance exponent is quadratic in inverse distance,
+centering an adaptive Gauss--Hermite quadrature on the analytic peak location and width within the RIFT framework~\cite{2026arXiv260937393O}.
+The present work is complementary:
+we derive closed-form limiting expressions at high SNR and in the prior-dominated regime,
+treat arbitrary smooth distance priors, and provide a regime-selection scheme with accuracy benchmarks against lookup tables and arbitrary-precision references.
 
 \begin{acknowledgments}
 The software and this manuscript were developed with the assistance of an AI coding assistant (Claude,
